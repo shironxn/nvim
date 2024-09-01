@@ -83,4 +83,83 @@ return {
       end,
     },
   },
+
+  {
+    "IogaMaster/neocord",
+    event = "VeryLazy",
+    config = function()
+      require "configs.discord"
+    end,
+  },
+
+  {
+    "derektata/lorem.nvim",
+    config = function()
+      require("lorem").setup {
+        sentenceLength = "medium",
+        comma_chance = 0.2,
+        max_commas_per_sentence = 2,
+      }
+    end,
+  },
+
+  {
+    "toppair/peek.nvim",
+    event = { "VeryLazy" },
+    build = "deno task --quiet build:fast",
+    config = function()
+      require("peek").setup { app = "firefox" }
+      vim.api.nvim_create_user_command("PeekOpen", require("peek").open, {})
+      vim.api.nvim_create_user_command("PeekClose", require("peek").close, {})
+    end,
+  },
+
+  {
+    "folke/noice.nvim",
+    event = "VeryLazy",
+    opts = {},
+    dependencies = {
+      "MunifTanjim/nui.nvim",
+      "rcarriga/nvim-notify",
+    },
+    config = function()
+      require "configs.noice"
+    end,
+  },
+
+  {
+    "kristijanhusak/vim-dadbod-ui",
+    dependencies = {
+      { "tpope/vim-dadbod", lazy = true },
+      { "kristijanhusak/vim-dadbod-completion", ft = { "sql", "mysql", "plsql" }, lazy = true }, -- Optional
+    },
+    cmd = {
+      "DBUI",
+      "DBUIToggle",
+      "DBUIAddConnection",
+      "DBUIFindBuffer",
+    },
+    init = function()
+      -- Your DBUI configuration
+      vim.g.db_ui_use_nerd_fonts = 1
+    end,
+  },
+
+  {
+    "vhyrro/luarocks.nvim",
+    priority = 1000,
+    config = true,
+    opts = {
+      rocks = { "lua-curl", "nvim-nio", "mimetypes", "xml2lua" },
+    },
+  },
+  {
+    "rest-nvim/rest.nvim",
+    ft = "http",
+    dependencies = { "luarocks.nvim" },
+    config = function()
+      require("rest-nvim").setup()
+      require "configs.rest"
+    end,
+  },
 }
