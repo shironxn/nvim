@@ -13,6 +13,7 @@ local servers = {
   "tailwindcss",
   "eslint",
   "clangd",
+  "prismals",
 }
 
 -- lsps with default config
