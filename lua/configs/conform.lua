@@ -7,6 +7,8 @@ local options = {
     typescript = { "prettierd" },
     go = { "gopls" },
     c = { "clang-format" },
+    cpp = { "clang-format" },
+    markdown = { "prettierd" },
   },
 
   format_on_save = {
