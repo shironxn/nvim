@@ -152,6 +152,11 @@ vim.o.splitbelow = true
 vim.o.list = false
 vim.opt.listchars = { tab = "» ", trail = "·", nbsp = "␣" }
 
+-- Tab & Indentation
+vim.opt.tabstop = 2
+vim.opt.shiftwidth = 2
+vim.opt.expandtab = true
+
 -- Preview substitutions live, as you type!
 vim.o.inccommand = "split"
 
@@ -350,6 +355,7 @@ require("lazy").setup({
 				map("n", "<leader>hs", gitsigns.stage_hunk, { desc = "Stage hunk" })
 				map("n", "<leader>hr", gitsigns.reset_hunk, { desc = "Reset hunk" })
 				map("n", "<leader>hp", gitsigns.preview_hunk, { desc = "Preview hunk" })
+				map("n", "<leader>hd", gitsigns.diffthis, { desc = "Diff buffer against git" })
 				map("n", "<leader>hb", gitsigns.blame_line, { desc = "Blame line" })
 			end,
 		},
@@ -527,10 +533,21 @@ require("lazy").setup({
 			vim.keymap.set("n", "<leader>fb", builtin.buffers, { desc = "Buffers" })
 			vim.keymap.set("n", "<leader>fr", builtin.oldfiles, { desc = "Recent files" })
 
-			-- Git pickers
-			vim.keymap.set("n", "<leader>gs", builtin.git_status, { desc = "Status" })
-			vim.keymap.set("n", "<leader>gc", builtin.git_commits, { desc = "Commits" })
-			vim.keymap.set("n", "<leader>gb", builtin.git_branches, { desc = "Branches" })
+			-- Git pickers (guarded so non-git directories don't throw Lua error)
+			local function git_picker(fn)
+				return function()
+					vim.fn.system("git rev-parse --is-inside-work-tree")
+					if vim.v.shell_error ~= 0 then
+						vim.notify("Not a git repository", vim.log.levels.WARN, { title = "Telescope" })
+						return
+					end
+					fn()
+				end
+			end
+
+			vim.keymap.set("n", "<leader>gs", git_picker(builtin.git_status), { desc = "Status" })
+			vim.keymap.set("n", "<leader>gc", git_picker(builtin.git_commits), { desc = "Commits" })
+			vim.keymap.set("n", "<leader>gb", git_picker(builtin.git_branches), { desc = "Branches" })
 
 			-- This runs on LSP attach per buffer (see main LSP attach function in 'neovim/nvim-lspconfig' config for more info,
 			-- it is better explained there). This allows easily switching between pickers if you prefer using something else!
@@ -1056,6 +1073,9 @@ require("lazy").setup({
 				return "%2l:%-2v"
 			end
 
+			-- Indent scope visualization
+			require("mini.indentscope").setup()
+
 			-- ... and there is more!
 			--  Check out: https://github.com/nvim-mini/mini.nvim
 		end,
@@ -1161,6 +1181,12 @@ require("lazy").setup({
 	--  Here are some example plugins that I've included in the Kickstart repository.
 	--  Uncomment any of the lines below to enable them (you will need to restart nvim).
 	--
+	{
+		"lukas-reineke/indent-blankline.nvim",
+		main = "ibl",
+		opts = {},
+	},
+
 	-- require 'kickstart.plugins.debug',
 	-- require 'kickstart.plugins.indent_line',
 	-- require 'kickstart.plugins.lint',
