@@ -745,6 +745,22 @@ require("lazy").setup({
 				clangd = {},
 				pyright = {},
 				ts_ls = {},
+				astro = {
+					-- astro-ls requires typescript.tsdk; fall back to the TS bundled with mason's ts_ls
+					-- when the project has no local typescript (global TS 7.x can no longer be used)
+					before_init = function(_, config)
+						local tsdk = ""
+						local ok, util = pcall(require, "lspconfig.util")
+						if ok then
+							tsdk = util.get_typescript_server_path(config.root_dir)
+						end
+						if tsdk == "" then
+							tsdk = vim.fn.stdpath("data")
+								.. "/mason/packages/typescript-language-server/node_modules/typescript/lib"
+						end
+						config.init_options.typescript.tsdk = tsdk
+					end,
+				},
 				bashls = {},
 				jsonls = {},
 				stylua = {}, -- Used to format Lua code
@@ -851,6 +867,7 @@ require("lazy").setup({
 				typescriptreact = { "prettierd", "prettier", stop_after_first = true },
 				json = { "prettierd", "prettier", stop_after_first = true },
 				markdown = { "prettierd", "prettier", stop_after_first = true },
+				astro = { "prettierd", "prettier", stop_after_first = true },
 				python = { "isort", "black" },
 			},
 		},
@@ -910,7 +927,7 @@ require("lazy").setup({
 				-- <c-k>: Toggle signature help
 				--
 				-- See :h blink-cmp-config-keymap for defining your own keymap
-				preset = "default",
+				preset = "super-tab",
 
 				-- For more advanced Luasnip keymaps (e.g. selecting choice nodes, expansion) see:
 				--    https://github.com/L3MON4D3/LuaSnip?tab=readme-ov-file#keymaps
@@ -941,7 +958,7 @@ require("lazy").setup({
 			-- the rust implementation via `'prefer_rust_with_warning'`
 			--
 			-- See :h blink-cmp-config-fuzzy for more information
-			fuzzy = { implementation = "lua" },
+			fuzzy = { implementation = "prefer_rust_with_warning" },
 
 			-- Shows a signature help window while you type arguments for a function
 			signature = { enabled = true },
@@ -1000,8 +1017,8 @@ require("lazy").setup({
 	{ -- Supermaven: Fast AI Code Completion
 		"supermaven-inc/supermaven-nvim",
 		opts = {
-			keymaps = {
-				accept_suggestion = "<Tab>",
+		keymaps = {
+					accept_suggestion = "<C-l>",
 				clear_suggestion = "<C-]>",
 				accept_word = "<C-j>",
 			},
@@ -1009,6 +1026,10 @@ require("lazy").setup({
 				help = true,
 				gitcommit = true,
 				gitrebase = true,
+				NvimTree = true,
+				TelescopePrompt = true,
+				mason = true,
+				lazy = true,
 			},
 			color = {
 				suggestion_color = "#71717a",
