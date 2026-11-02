@@ -1074,28 +1074,43 @@ require("lazy").setup({
 		},
 	},
 
-	{ -- Supermaven: Fast AI Code Completion
-		"supermaven-inc/supermaven-nvim",
-		opts = {
-		keymaps = {
-					accept_suggestion = "<C-l>",
-				clear_suggestion = "<C-]>",
-				accept_word = "<C-j>",
-			},
-			ignore_filetypes = {
-				help = true,
-				gitcommit = true,
-				gitrebase = true,
-				NvimTree = true,
-				TelescopePrompt = true,
-				mason = true,
-				lazy = true,
-			},
-			color = {
-				suggestion_color = "#71717a",
-				cterm = 244,
-			},
+	{ -- Windsurf / Codeium: Fast AI Code Completion
+		"Exafunction/windsurf.nvim",
+		event = "BufReadPost",
+		cmd = "Codeium",
+		dependencies = {
+			"nvim-lua/plenary.nvim",
 		},
+		config = function()
+			require("codeium").setup({
+				enable_cmp_source = false,
+				virtual_text = {
+					enabled = true,
+					idle_delay = 75,
+					accept_fallback = "",
+					filetypes = {
+						help = false,
+						gitcommit = false,
+						gitrebase = false,
+						NvimTree = false,
+						TelescopePrompt = false,
+						mason = false,
+						lazy = false,
+					},
+					key_bindings = {
+						accept = "<C-l>",
+						accept_word = false,
+						accept_line = false,
+						clear = "<C-]>",
+						next = "<M-]>",
+						prev = "<M-[>",
+					},
+				},
+				workspace_root = {
+					use_lsp = true,
+				},
+			})
+		end,
 	},
 
 	{ -- WakaTime: Coding metrics and time tracking

@@ -12,7 +12,7 @@ Personal Neovim configuration based on modern **Kickstart.nvim**, focused on spe
 - **Syntax Highlighting:** [`nvim-treesitter`](https://github.com/nvim-treesitter/nvim-treesitter)
 - **File Explorer:** [`nvim-tree.lua`](https://github.com/nvim-tree/nvim-tree.lua)
 - **Git Integration:** [`gitsigns.nvim`](https://github.com/lewis6991/gitsigns.nvim) with inline blame & hunk navigation
-- **AI Completion:** [`supermaven-nvim`](https://github.com/supermaven-inc/supermaven-nvim)
+- **AI Completion:** [`windsurf.nvim`](https://github.com/Exafunction/windsurf.nvim) (Codeium)
 - **Time Tracking:** [`vim-wakatime`](https://github.com/wakatime/vim-wakatime)
 - **Theme:** Dynamic Pywal (`~/.cache/wal/colors.json`) with seamless terminal background
 
