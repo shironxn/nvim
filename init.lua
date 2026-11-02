@@ -494,6 +494,35 @@ require("lazy").setup({
 
 			-- [[ Configure Telescope ]]
 			-- See `:help telescope` and `:help telescope.setup()`
+			local telescope_actions = require("telescope.actions")
+
+			-- git_commits maps <C-r>h to `git reset --hard` without asking; require confirmation.
+			-- The builtin re-registers this key in attach_mappings, so it can't be disabled via pickers.mappings.
+			do
+				local reset_hard = telescope_actions.git_reset_hard
+				telescope_actions.git_reset_hard = function(prompt_bufnr)
+					if vim.fn.confirm("git reset --hard to the selected commit?", "&No\n&Yes", 1) == 2 then
+						return reset_hard(prompt_bufnr)
+					end
+				end
+			end
+
+			-- git_commits defaults <CR> to `git checkout <commit>` (detached HEAD).
+			-- Show the commit instead; checkout stays on <C-o>.
+			local function show_commit(prompt_bufnr)
+				local entry = require("telescope.actions.state").get_selected_entry()
+				telescope_actions.close(prompt_bufnr)
+				if not entry then
+					return
+				end
+				local lines = vim.fn.systemlist({ "git", "--no-pager", "show", entry.value })
+				vim.cmd("tabnew")
+				vim.bo.buftype = "nofile"
+				vim.bo.bufhidden = "wipe"
+				vim.bo.filetype = "git"
+				vim.api.nvim_buf_set_lines(0, 0, -1, false, lines)
+			end
+
 			require("telescope").setup({
 				-- You can put your default mappings / updates / etc. in here
 				--  All the info you're looking for is in `:help telescope.setup()`
@@ -503,7 +532,27 @@ require("lazy").setup({
 				--     i = { ['<c-enter>'] = 'to_fuzzy_refine' },
 				--   },
 				-- },
-				-- pickers = {}
+				pickers = {
+					git_commits = {
+						mappings = {
+							i = {
+								["<CR>"] = show_commit,
+								["<C-o>"] = telescope_actions.git_checkout,
+							},
+							n = {
+								["<CR>"] = show_commit,
+								["<C-o>"] = telescope_actions.git_checkout,
+							},
+						},
+					},
+					-- <C-r> rebases the selected branch without a confirmation prompt
+					git_branches = {
+						mappings = {
+							i = { ["<C-r>"] = false },
+							n = { ["<C-r>"] = false },
+						},
+					},
+				},
 				extensions = {
 					["ui-select"] = { require("telescope.themes").get_dropdown() },
 				},
@@ -533,15 +582,15 @@ require("lazy").setup({
 			vim.keymap.set("n", "<leader>fb", builtin.buffers, { desc = "Buffers" })
 			vim.keymap.set("n", "<leader>fr", builtin.oldfiles, { desc = "Recent files" })
 
-			-- Git pickers (guarded so non-git directories don't throw Lua error)
-			local function git_picker(fn)
+			-- Git pickers scoped to the buffer's repo root, guarded so non-git buffers don't throw
+			local function git_picker(picker)
 				return function()
-					vim.fn.system("git rev-parse --is-inside-work-tree")
-					if vim.v.shell_error ~= 0 then
+					local root = vim.fs.root(0, ".git")
+					if not root then
 						vim.notify("Not a git repository", vim.log.levels.WARN, { title = "Telescope" })
 						return
 					end
-					fn()
+					picker({ cwd = root })
 				end
 			end
 
