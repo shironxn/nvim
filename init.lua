@@ -279,6 +279,17 @@ require("lazy").setup({
 	{ "NMAC427/guess-indent.nvim", opts = {} },
 
 	{
+		"windwp/nvim-autopairs",
+		event = "InsertEnter",
+		opts = {},
+	},
+	{
+		"windwp/nvim-ts-autotag",
+		event = "InsertEnter",
+		opts = {},
+	},
+
+	{
 		"christoomey/vim-tmux-navigator",
 		cmd = {
 			"TmuxNavigateLeft",
