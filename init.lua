@@ -200,7 +200,11 @@ vim.diagnostic.config({
 	virtual_lines = false, -- Text shows up underneath the line, with virtual lines
 
 	-- Auto open the float, so you can easily read the errors when jumping with `[d` and `]d`
-	jump = { float = true },
+	jump = {
+		on_jump = function(_, bufnr)
+			vim.diagnostic.open_float({ bufnr = bufnr, scope = "cursor", focus = false })
+		end,
+	},
 })
 
 vim.keymap.set("n", "<leader>q", vim.diagnostic.setloclist, { desc = "Diagnostic quickfix list" })
@@ -823,7 +827,6 @@ require("lazy").setup({
 				},
 				bashls = {},
 				jsonls = {},
-				stylua = {}, -- Used to format Lua code
 
 				-- Special Lua Config, as recommended by neovim help docs
 				lua_ls = {
@@ -876,6 +879,8 @@ require("lazy").setup({
 			vim.list_extend(ensure_installed, {
 				"stylua",
 				"prettierd",
+				"isort",
+				"black",
 			})
 
 			require("mason-tool-installer").setup({ ensure_installed = ensure_installed })
@@ -1280,7 +1285,7 @@ require("lazy").setup({
 	{
 		"lukas-reineke/indent-blankline.nvim",
 		main = "ibl",
-		opts = {},
+		opts = { scope = { enabled = false } },
 	},
 
 	-- require 'kickstart.plugins.debug',
@@ -1301,6 +1306,7 @@ require("lazy").setup({
 	-- In normal mode type `<space>sh` then write `lazy.nvim-plugin`
 	-- you can continue same window with `<space>sr` which resumes last telescope search
 }, { ---@diagnostic disable-line: missing-fields
+	rocks = { enabled = false },
 	ui = {
 		-- If you are using a Nerd Font: set icons to an empty table which will use the
 		-- default lazy.nvim defined Nerd Font icons, otherwise define a unicode icons table

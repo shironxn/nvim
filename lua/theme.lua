@@ -280,6 +280,9 @@ function M.apply(path)
   hl('DiagnosticUnnecessary', { fg = comment })
   hl('DiagnosticDeprecated', { fg = comment, strikethrough = true })
   hl('LspInlayHint', { fg = comment, italic = true })
+  -- AI ghost text (windsurf.nvim sets this with `default = true`, so defining
+  -- it here wins and keeps it on the palette instead of its static gray).
+  hl('CodeiumSuggestion', { fg = comment, italic = true })
   hl('LspCodeLens', { fg = comment })
   hl('LspReferenceText', { bg = line })
   hl('LspReferenceRead', { bg = line })
